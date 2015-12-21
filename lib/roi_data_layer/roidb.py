@@ -17,6 +17,7 @@ def prepare_roidb(imdb):
     overlap, taken over ground-truth boxes, between each ROI and
     each ground-truth box. The class with maximum overlap is also
     recorded.
+    给roidb增加一些有用的信息吧
     """
     roidb = imdb.roidb
     for i in xrange(len(imdb.image_index)):

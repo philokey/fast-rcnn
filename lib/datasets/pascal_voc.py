@@ -24,6 +24,7 @@ class pascal_voc(datasets.imdb):
         self._image_set = image_set
         self._devkit_path = self._get_default_path() if devkit_path is None \
                             else devkit_path
+        #原始图片数据的文件夹
         self._data_path = os.path.join(self._devkit_path, 'VOC' + self._year)
         self._classes = ('__background__', # always index 0
                          'aeroplane', 'bicycle', 'bird', 'boat',
@@ -31,6 +32,8 @@ class pascal_voc(datasets.imdb):
                          'cow', 'diningtable', 'dog', 'horse',
                          'motorbike', 'person', 'pottedplant',
                          'sheep', 'sofa', 'train', 'tvmonitor')
+
+        #把每一类映射成数字,存成字典
         self._class_to_ind = dict(zip(self.classes, xrange(self.num_classes)))
         self._image_ext = '.jpg'
         self._image_index = self._load_image_set_index()
@@ -66,6 +69,7 @@ class pascal_voc(datasets.imdb):
     def _load_image_set_index(self):
         """
         Load the indexes listed in this dataset's image set file.
+        读入图片的名字,不含扩展名
         """
         # Example path to image set file:
         # self._devkit_path + /VOCdevkit2007/VOC2007/ImageSets/Main/val.txt
@@ -133,6 +137,9 @@ class pascal_voc(datasets.imdb):
         return roidb
 
     def _load_selective_search_roidb(self, gt_roidb):
+        '''
+        load selective search results
+        '''
         filename = os.path.abspath(os.path.join(self.cache_path, '..',
                                                 'selective_search_data',
                                                 self.name + '.mat'))
@@ -142,7 +149,7 @@ class pascal_voc(datasets.imdb):
 
         box_list = []
         for i in xrange(raw_data.shape[0]):
-            box_list.append(raw_data[i][:, (1, 0, 3, 2)] - 1)
+            box_list.append(raw_data[i][:, (1, 0, 3, 2)] - 1) #注意顺序，以及坐标从0开始，所以-1
 
         return self.create_roidb_from_box_list(box_list, gt_roidb)
 
@@ -206,6 +213,7 @@ class pascal_voc(datasets.imdb):
 
         boxes = np.zeros((num_objs, 4), dtype=np.uint16)
         gt_classes = np.zeros((num_objs), dtype=np.int32)
+        #box i 和物体 j的重叠程度
         overlaps = np.zeros((num_objs, self.num_classes), dtype=np.float32)
 
         # Load object bounding boxes into a data frame.
@@ -221,7 +229,7 @@ class pascal_voc(datasets.imdb):
             gt_classes[ix] = cls
             overlaps[ix, cls] = 1.0
 
-        overlaps = scipy.sparse.csr_matrix(overlaps)
+        overlaps = scipy.sparse.csr_matrix(overlaps) #压缩稀疏矩阵(Compressed Sparse Row matrix)
 
         return {'boxes' : boxes,
                 'gt_classes': gt_classes,

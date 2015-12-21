@@ -8,6 +8,8 @@
 """The data layer used during training to train a Fast R-CNN network.
 
 RoIDataLayer implements a Caffe Python layer.
+对应了train.prototxt里面的python层
+封装的不能看了
 """
 
 import caffe

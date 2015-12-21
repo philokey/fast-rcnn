@@ -37,7 +37,7 @@ class SolverWrapper(object):
         if pretrained_model is not None:
             print ('Loading pretrained model '
                    'weights from {:s}').format(pretrained_model)
-            self.solver.net.copy_from(pretrained_model)
+            self.solver.net.copy_from(pretrained_model) #获取pre_training 数据
 
         self.solver_param = caffe_pb2.SolverParameter()
         with open(solver_prototxt, 'rt') as f:
@@ -88,7 +88,7 @@ class SolverWrapper(object):
         while self.solver.iter < max_iters:
             # Make one SGD update
             timer.tic()
-            self.solver.step(1)
+            self.solver.step(1) #迭代一次，包括了forward和backward
             timer.toc()
             if self.solver.iter % (10 * self.solver_param.display) == 0:
                 print 'speed: {:.3f}s / iter'.format(timer.average_time)
